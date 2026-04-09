@@ -61,8 +61,16 @@
     <audio id="bg-audio" loop>
       <source src="music/crystal-castles-vanished_or6O7LyH.mp3" type="audio/mpeg" />
     </audio>
-    <button class="mute-btn" id="mute-btn" title="toggle music">
-      <span class="mute-icon" id="mute-icon">♩</span>
+    <button class="mute-btn" id="mute-btn" title="tocar / pausar música">
+      <svg id="icon-play" class="music-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.2"/>
+        <polygon points="10,8 17,12 10,16" fill="currentColor"/>
+      </svg>
+      <svg id="icon-pause" class="music-svg hidden" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="8.5" y="8" width="2.5" height="8" rx="1" fill="currentColor"/>
+        <rect x="13" y="8" width="2.5" height="8" rx="1" fill="currentColor"/>
+      </svg>
       <span class="mute-label" id="mute-label">música</span>
     </button>
   </div>
@@ -243,34 +251,13 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       ELEMENTO SECRETO
-       Área invisível no rodapé. Ao clicar, revela uma mensagem.
-       Para trocar a mensagem: edite o texto dentro de #secret-msg
-       Para trocar o texto do trigger: edite .secret-trigger
-  ============================================================= -->
   <section class="section footer-section" id="footer">
     <div class="footer-content">
       <p class="footer-year reveal">mmxxvi</p>
-      <span class="secret-trigger reveal" id="secret-trigger" title="">∴</span>
       <p class="secret-hint reveal">há algo escondido aqui.</p>
       <button class="secret-page-btn reveal" id="open-secret-page" title="">?</button>
     </div>
   </section>
-
-  <!-- Overlay da mensagem secreta -->
-  <div class="secret-overlay" id="secret-overlay">
-    <div class="secret-msg" id="secret-msg">
-      <!-- =====================================================
-           MENSAGEM SECRETA
-           Edite o texto abaixo à vontade.
-      ====================================================== -->
-      <p class="secret-line">você encontrou isso.</p>
-      <p class="secret-line">não era pra qualquer um.</p>
-      <p class="secret-line secondary">— obrigado por estar aqui.</p>
-      <button class="secret-close" id="secret-close">fechar</button>
-    </div>
-  </div>
 
   <!-- ============================================================
        PÁGINA SECRETA (overlay full-screen)

@@ -137,11 +137,11 @@ a, button { cursor: none; }
 .mute-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 6px 14px 6px 10px;
+  border-radius: 24px;
+  padding: 8px 16px 8px 10px;
   color: var(--text-muted);
   font-family: var(--font);
   font-size: 0.68rem;
@@ -165,19 +165,23 @@ a, button { cursor: none; }
   color: var(--accent-light);
 }
 
-.mute-icon {
-  font-size: 0.9rem;
-  line-height: 1;
+.music-svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  transition: opacity var(--transition);
 }
 
-/* Animação de pulso quando tocando */
-.mute-btn.playing .mute-icon {
-  animation: pulse-icon 2s ease-in-out infinite;
+.music-svg.hidden { display: none; }
+
+/* Pulso no ícone quando tocando */
+.mute-btn.playing .music-svg {
+  animation: pulse-icon 2.5s ease-in-out infinite;
 }
 
 @keyframes pulse-icon {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.55; }
 }
 
 /* ================================================================
@@ -861,95 +865,6 @@ a, button { cursor: none; }
   .sp-title { font-size: clamp(1.4rem, 7vw, 1.9rem); }
 }
 
-/* O trigger secreto parece apenas um símbolo decorativo */
-.secret-trigger {
-  font-size: 0.9rem;
-  color: var(--text-faint);
-  opacity: 0.3;
-  transition: opacity var(--transition);
-  display: block;
-  text-align: center;
-  padding: 12px;
-  border-radius: 50%;
-  user-select: none;
-}
-
-/* Ao hover, barely visível — o segredo está no sutil */
-.secret-trigger:hover {
-  opacity: 0.6;
-  color: var(--accent-light);
-}
-
-/* ================================================================
-   OVERLAY DA MENSAGEM SECRETA
-================================================================ */
-
-.secret-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 10, 10, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.6s ease;
-}
-
-.secret-overlay.visible {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.secret-msg {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  transform: translateY(20px);
-  transition: transform 0.6s ease;
-}
-
-.secret-overlay.visible .secret-msg {
-  transform: translateY(0);
-}
-
-.secret-line {
-  font-size: clamp(1rem, 3vw, 1.4rem);
-  font-weight: 200;
-  color: var(--text);
-  letter-spacing: 0.05em;
-}
-
-.secret-line.secondary {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  letter-spacing: 0.15em;
-  margin-top: 8px;
-}
-
-.secret-close {
-  margin-top: 40px;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 8px 24px;
-  color: var(--text-faint);
-  font-family: var(--font);
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: lowercase;
-  transition: all var(--transition);
-}
-
-.secret-close:hover {
-  border-color: var(--border-glow);
-  color: var(--text);
-}
 
 /* ================================================================
    ANIMAÇÕES DE ENTRADA (SCROLL REVEAL)
@@ -1444,36 +1359,6 @@ body.cyber .footer-year {
   color: var(--text-faint);
 }
 
-body.cyber .secret-trigger {
-  color: var(--text-faint);
-  font-family: 'Space Mono', monospace;
-}
-
-/* Secret overlay cyber */
-body.cyber .secret-overlay {
-  background: rgba(2, 11, 2, 0.95);
-}
-
-body.cyber .secret-line {
-  font-family: 'Space Mono', monospace;
-  color: var(--accent);
-  font-size: clamp(0.85rem, 2.5vw, 1.1rem);
-}
-
-body.cyber .secret-line.secondary {
-  color: var(--text-muted);
-}
-
-body.cyber .secret-close {
-  font-family: 'Space Mono', monospace;
-  border-radius: 0;
-  border-color: rgba(0,255,65,0.2);
-}
-
-body.cyber .secret-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 
 /* Scrollbar cyber */
 body.cyber ::-webkit-scrollbar-thumb { background: var(--accent); }

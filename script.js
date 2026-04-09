@@ -290,85 +290,77 @@ themeToggle.addEventListener('click', () => {
 // Escala: 0.0 (mudo) até 1.0 (máximo)
 // ================================================================
 
-const INITIAL_VOLUME = 0.08; // Volume inicial bem baixo — discreto
+const INITIAL_VOLUME = 0.08;
 
-const audio    = document.getElementById('bg-audio');
-const muteBtn  = document.getElementById('mute-btn');
-const muteIcon = document.getElementById('mute-icon');
-const muteLabel = document.getElementById('mute-label');
+const audio      = document.getElementById('bg-audio');
+const muteBtn    = document.getElementById('mute-btn');
+const iconPlay   = document.getElementById('icon-play');
+const iconPause  = document.getElementById('icon-pause');
+const muteLabel  = document.getElementById('mute-label');
 
 let isPlaying = false;
 let isMuted   = false;
 
 audio.volume = INITIAL_VOLUME;
 
-// Tenta autoplay ao carregar.
-// Browsers bloqueiam autoplay sem interação — capturamos qualquer
-// movimento ou toque do usuário para iniciar imediatamente.
-function tryAutoplay() {
-  audio.volume = 0; // começa mudo para o fade in
-  const playPromise = audio.play();
-  if (playPromise !== undefined) {
-    playPromise
-      .then(() => {
-        isPlaying = true;
-        fadeVolume(audio, 0, INITIAL_VOLUME, 1500);
-        updateMuteBtn();
-      })
-      .catch(() => {
-        isPlaying = false;
-        updateMuteBtn();
-        // Dispara na primeira interação possível (mouse, toque, tecla, scroll)
-        const events = ['mousemove', 'touchstart', 'click', 'keydown', 'scroll'];
-        function startOnInteraction() {
-          audio.volume = 0;
-          audio.play().then(() => {
-            isPlaying = true;
-            isMuted = false;
-            fadeVolume(audio, 0, INITIAL_VOLUME, 1500);
-            updateMuteBtn();
-          }).catch(() => {});
-          events.forEach(ev => document.removeEventListener(ev, startOnInteraction));
-        }
-        events.forEach(ev => document.addEventListener(ev, startOnInteraction, { once: false }));
-      });
+function updateMuteBtn() {
+  if (isPlaying && !isMuted) {
+    muteBtn.classList.add('playing');
+    iconPlay.classList.add('hidden');
+    iconPause.classList.remove('hidden');
+    muteLabel.textContent = 'pausar';
+  } else {
+    muteBtn.classList.remove('playing');
+    iconPlay.classList.remove('hidden');
+    iconPause.classList.add('hidden');
+    muteLabel.textContent = 'música';
   }
 }
 
-function updateMuteBtn() {
-  if (!isPlaying || isMuted) {
-    muteBtn.classList.remove('playing');
-    muteIcon.textContent  = '♩';
-    muteLabel.textContent = 'música';
-  } else {
-    muteBtn.classList.add('playing');
-    muteIcon.textContent  = '♫';
-    muteLabel.textContent = 'tocando';
-  }
+function tryAutoplay() {
+  audio.volume = 0;
+  audio.play()
+    .then(() => {
+      isPlaying = true;
+      fadeVolume(audio, 0, INITIAL_VOLUME, 1500);
+      updateMuteBtn();
+    })
+    .catch(() => {
+      isPlaying = false;
+      updateMuteBtn();
+      const events = ['touchstart', 'touchend', 'click', 'keydown'];
+      function startOnInteraction(e) {
+        // No mobile, só inicia se o clique não foi no botão de música
+        if (e.target === muteBtn || muteBtn.contains(e.target)) return;
+        audio.volume = 0;
+        audio.play().then(() => {
+          isPlaying = true;
+          isMuted   = false;
+          fadeVolume(audio, 0, INITIAL_VOLUME, 1500);
+          updateMuteBtn();
+        }).catch(() => {});
+        events.forEach(ev => document.removeEventListener(ev, startOnInteraction));
+      }
+      events.forEach(ev => document.addEventListener(ev, startOnInteraction));
+    });
 }
 
 muteBtn.addEventListener('click', () => {
   if (!isPlaying) {
-    // Primeira vez — inicia a música
+    audio.volume = 0;
     audio.play().then(() => {
       isPlaying = true;
       isMuted   = false;
-      audio.volume = INITIAL_VOLUME;
+      fadeVolume(audio, 0, INITIAL_VOLUME, 800);
       updateMuteBtn();
     }).catch(() => {});
   } else if (!isMuted) {
-    // Muta
     isMuted = true;
-    // Fade out suave
-    fadeVolume(audio, audio.volume, 0, 600, () => {
-      audio.pause();
-    });
+    fadeVolume(audio, audio.volume, 0, 500, () => audio.pause());
     updateMuteBtn();
   } else {
-    // Desmuta
     isMuted = false;
     audio.play();
-    // Fade in suave
     fadeVolume(audio, 0, INITIAL_VOLUME, 800);
     updateMuteBtn();
   }
@@ -468,41 +460,10 @@ if (discordCard) {
 
 // ================================================================
 // 8. ELEMENTO SECRETO
-// ================================================================
-// Para editar a mensagem secreta: altere o HTML dentro de
-// #secret-msg no index.html
-// ================================================================
-
-const secretTrigger = document.getElementById('secret-trigger');
-const secretOverlay = document.getElementById('secret-overlay');
-const secretClose   = document.getElementById('secret-close');
-
-// Abre o overlay secreto
-secretTrigger.addEventListener('click', () => {
-  secretOverlay.classList.add('visible');
-  document.body.style.overflow = 'hidden';
-});
-
-// Fecha o overlay secreto
-secretClose.addEventListener('click', closeSecret);
-
-// Fecha ao clicar fora da mensagem
-secretOverlay.addEventListener('click', (e) => {
-  if (e.target === secretOverlay) closeSecret();
-});
-
-// Fecha com Escape
+// Fecha página secreta com Escape
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeSecret();
-    closeSecretPage();
-  }
+  if (e.key === 'Escape') closeSecretPage();
 });
-
-function closeSecret() {
-  secretOverlay.classList.remove('visible');
-  document.body.style.overflow = '';
-}
 
 // ================================================================
 // 9. PÁGINA SECRETA (overlay interno)
@@ -612,13 +573,13 @@ function openSecretPage() {
   spPage.classList.add('sp-open');
   spPage.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-  // Pausa música principal com fade
-  if (isPlaying && !isMuted) {
-    fadeVolume(audio, audio.volume, 0, 500);
-  }
-  // Inicia música secreta após um delay atmosférico
+  // Para o áudio principal imediatamente (garante no mobile)
+  audio.pause();
+  audio.volume = 0;
+  // Inicia música secreta após delay atmosférico
   setTimeout(spTryPlay, 700);
 }
+
 
 // Fechar página secreta
 spClose.addEventListener('click', closeSecretPage);
@@ -639,9 +600,12 @@ function closeSecretPage() {
       spUpdateMute();
     });
   }
-  // Retoma música principal
-  if (isPlaying) {
-    fadeVolume(audio, 0, INITIAL_VOLUME, 1000);
+  // Retoma música principal se estava tocando antes
+  if (isPlaying && !isMuted) {
+    audio.volume = 0;
+    audio.play().then(() => {
+      fadeVolume(audio, 0, INITIAL_VOLUME, 1000);
+    }).catch(() => {});
   }
 }
 
