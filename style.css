@@ -600,13 +600,17 @@ a, button { cursor: none; }
   border-color: var(--border);
 }
 
-/* Faíscas ocasionais — quase imperceptíveis */
+/* Faíscas ocasionais */
 @keyframes btn-glitch {
-  0%,  88%  { color: transparent; opacity: 0; text-shadow: none; }
-  89%        { color: #00ff41;     opacity: 0.35; text-shadow: none; }
-  89.3%      { color: transparent; opacity: 0;    text-shadow: none; }
-  93%        { color: #00e5ff;     opacity: 0.28; text-shadow: none; }
-  93.2%      { color: transparent; opacity: 0;    text-shadow: none; }
+  0%,  82%  { color: transparent; opacity: 0; text-shadow: none; }
+  83%        { color: #00ff41;     opacity: 0.85; text-shadow: 0 0 8px #00ff41, 0 0 18px #00ff4166; }
+  83.5%      { color: transparent; opacity: 0;    text-shadow: none; }
+  84.5%      { color: #00ff41;     opacity: 0.6;  text-shadow: 0 0 6px #00ff41; }
+  85%        { color: transparent; opacity: 0;    text-shadow: none; }
+  91%        { color: #00e5ff;     opacity: 0.8;  text-shadow: 0 0 8px #00e5ff, 0 0 18px #00e5ff66; }
+  91.4%      { color: transparent; opacity: 0;    text-shadow: none; }
+  92.2%      { color: #00e5ff;     opacity: 0.55; text-shadow: 0 0 5px #00e5ff; }
+  92.5%      { color: transparent; opacity: 0;    text-shadow: none; }
   100%       { color: transparent; opacity: 0;    text-shadow: none; }
 }
 
