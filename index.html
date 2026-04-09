@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arquivo pessoal</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- =====================================================
+       TIPOGRAFIA: Inter (sans-serif fina e moderna)
+       Para trocar a fonte, altere o link abaixo e o
+       font-family no style.css (linha ~15)
+  ====================================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- =====================================================
+       CURSOR CUSTOMIZADO
+       O ponto que segue o mouse. Editável no script.js
+  ====================================================== -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursor-trail"></div>
+
+  <!-- =====================================================
+       GRAIN / RUÍDO DE FUNDO
+       Canvas gerado via JavaScript (script.js)
+       Para remover, delete a linha abaixo e a função
+       initGrain() no script.js
+  ====================================================== -->
+  <canvas id="grain-canvas"></canvas>
+  <!-- Névoa — visível apenas no tema padrão -->
+  <div id="fog-layer"></div>
+  <!-- Neve — visível apenas no tema padrão -->
+  <canvas id="snow-canvas"></canvas>
+  <!-- Matrix rain — visível apenas no tema cyber -->
+  <canvas id="matrix-canvas"></canvas>
+  <!-- Scanlines — visível apenas no tema cyber -->
+  <div class="scanlines" id="scanlines"></div>
+
+  <!-- =====================================================
+       PLAYER DE MÚSICA
+       Arquivo de música: /music/bg.mp3
+       Para trocar a música:
+         1. Coloque seu arquivo .mp3 na pasta /music/
+         2. Troque "bg.mp3" pelo nome do seu arquivo
+         3. O player inicia com volume baixo (0.08) — ajuste
+            no script.js, linha ~initAudio()
+  ====================================================== -->
+  <!-- Botão de troca de tema — canto superior direito -->
+  <button class="theme-toggle" id="theme-toggle" title="mudar clima">
+    <span class="theme-toggle-inner">
+      <span class="theme-icon-default">◈</span>
+      <span class="theme-icon-cyber">//</span>
+    </span>
+    <span class="theme-label" id="theme-label">clima</span>
+  </button>
+
+  <div class="music-player" id="music-player">
+    <audio id="bg-audio" loop>
+      <source src="music/crystal-castles-vanished_or6O7LyH.mp3" type="audio/mpeg" />
+    </audio>
+    <button class="mute-btn" id="mute-btn" title="toggle music">
+      <span class="mute-icon" id="mute-icon">♩</span>
+      <span class="mute-label" id="mute-label">música</span>
+    </button>
+  </div>
+
+  <!-- ============================================================
+       SEÇÃO 1: HERO
+       Texto principal: "solve et coagula"
+       Para trocar o texto, edite a tag <h1> abaixo
+  ============================================================= -->
+  <section class="section hero" id="hero">
+    <div class="hero-content">
+      <p class="hero-sub fade-in-up delay-1">—</p>
+      <h1 class="hero-title fade-in-up delay-2" data-text="solve et coagula">solve et coagula</h1>
+      <p class="hero-sub fade-in-up delay-3">dissolve e recombina</p>
+      <p class="hero-cyber-sub fade-in-up delay-3">// system online — uptime: ∞</p>
+    </div>
+    <!-- Gradiente decorativo de fundo -->
+    <div class="hero-glow"></div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 2: SOBRE MIM (fragmentada)
+       Edite as frases abaixo livremente.
+       Cada <span class="fragment"> é uma frase independente.
+       Você pode adicionar ou remover frases à vontade.
+  ============================================================= -->
+  <section class="section about" id="about">
+    <!-- Texto padrão (tema melancólico) -->
+    <div class="fragments-container default-fragments">
+      <span class="fragment reveal f1">a vida se move como um eco distante,</span>
+      <span class="fragment reveal f2">repete gestos, rostos, desejos.</span>
+      <span class="fragment reveal f3">até que tudo começa a perder contorno.</span>
+      <span class="fragment reveal f4">o que antes parecia sólido</span>
+      <span class="fragment reveal f5">se dissolve devagar,</span>
+      <span class="fragment reveal f6">como se nunca tivesse sido real.</span>
+    </div>
+
+    <!-- Texto cyber (tema cyberpunk) -->
+    <div class="fragments-container cyber-fragments">
+      <span class="cyber-line reveal f1">
+        <span class="cy-pt">agora acabou, você perdeu sua vida</span>
+        <span class="cy-en">now it's over, you've taken your life</span>
+      </span>
+      <span class="cyber-line reveal f2">
+        <span class="cy-pt">a escuridão vem à tona, me resta se esconder</span>
+        <span class="cy-en">dark grows thin, and i'm left to hide</span>
+      </span>
+      <span class="cyber-line reveal f3">
+        <span class="cy-pt">eu não me arrependo, mas é triste de qualquer maneira</span>
+        <span class="cy-en">i don't regret it, but it's sad anyway</span>
+      </span>
+      <span class="cyber-line reveal f4">
+        <span class="cy-pt">agora estamos mortos, e com medo do escuro</span>
+        <span class="cy-en">now we're both dead, and scared of the black</span>
+      </span>
+      <span class="cyber-line reveal f5">
+        <span class="cy-pt">esta vida de jogos e diligente confiança</span>
+        <span class="cy-en">this life of games and diligent trust</span>
+      </span>
+      <span class="cyber-line reveal f6">
+        <span class="cy-pt">as coisas que fazemos e as coisas que precisamos</span>
+        <span class="cy-en">the things we do and the things we must</span>
+      </span>
+      <span class="cyber-line reveal f7">
+        <span class="cy-pt">eu agora cansei de ser amaldiçoado</span>
+        <span class="cy-en">i'm now tired of being cussed</span>
+      </span>
+      <span class="cyber-line reveal" style="transition-delay:0.44s">
+        <span class="cy-pt">então descanse pra sempre, se acabe em poeira</span>
+        <span class="cy-en">so go sleep forever, end to dust</span>
+      </span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 3: GALERIA DE IMAGENS
+       Para adicionar suas imagens:
+         1. Coloque os arquivos na pasta /images/
+         2. Substitua os blocos <div class="img-placeholder">
+            por: <img src="images/NOME_DO_ARQUIVO.jpg" alt="..." />
+         3. Mantenha a classe "gallery-item" no wrapper
+
+       Estrutura de cada item:
+         <div class="gallery-item">
+           <img src="images/gato.jpg" alt="meu gato" />
+         </div>
+
+       Categorias de imagens sugeridas (comentadas abaixo):
+         - fotos do seu gato
+         - paisagens
+         - estética aleatória
+  ============================================================= -->
+  <section class="section gallery" id="gallery">
+    <div class="gallery-grid">
+
+      <div class="gallery-item reveal g1"><img src="images/eu.jpg" alt="" /></div>
+      <div class="gallery-item reveal g2"><img src="images/paisagem.jpg" alt="" /></div>
+      <div class="gallery-item reveal g3"><img src="images/img01.jpg" alt="" /></div>
+      <div class="gallery-item reveal g4"><img src="images/gato.jpg" alt="" /></div>
+      <div class="gallery-item reveal g5"><img src="images/img02.jpg" alt="" /></div>
+      <div class="gallery-item reveal g6"><img src="images/infancia.jpg" alt="" /></div>
+      <div class="gallery-item reveal g7"><img src="images/img03.jpg" alt="" /></div>
+      <div class="gallery-item reveal g8"><img src="images/estetica.jpg" alt="" /></div>
+      <div class="gallery-item reveal g9"><img src="images/img04.jpg" alt="" /></div>
+      <div class="gallery-item reveal g10"><img src="images/estetica2.jpg" alt="" /></div>
+      <div class="gallery-item reveal g11"><img src="images/img05.jpg" alt="" /></div>
+      <div class="gallery-item reveal g12"><img src="images/img06.jpg" alt="" /></div>
+      <div class="gallery-item reveal g13"><img src="images/img07.jpg" alt="" /></div>
+      <div class="gallery-item reveal g14"><img src="images/img08.jpg" alt="" /></div>
+      <div class="gallery-item reveal g15"><img src="images/img09.jpg" alt="" /></div>
+      <div class="gallery-item reveal g16"><img src="images/img10.jpg" alt="" /></div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 4: MÚSICA / INSPIRAÇÕES
+       Para adicionar ou remover artistas, edite a lista abaixo.
+       Para adicionar links, troque <span> por <a href="...">
+  ============================================================= -->
+  <section class="section music-inspiration" id="music">
+    <ul class="music-list">
+      <li class="music-item reveal m1"><span class="music-name">deftones</span></li>
+      <li class="music-item reveal m2"><span class="music-name">ghostemane</span></li>
+      <li class="music-item reveal m3"><span class="music-name">chevelle</span></li>
+      <li class="music-item reveal m4"><span class="music-name">yeat</span></li>
+      <li class="music-item reveal m5"><span class="music-name">crystal castles</span></li>
+      <li class="music-item reveal" style="transition-delay:0.36s"><span class="music-name">steve lacy</span></li>
+      <li class="music-item reveal" style="transition-delay:0.42s"><span class="music-name">$uicideboy$</span></li>
+      <li class="music-item reveal" style="transition-delay:0.48s"><span class="music-name">linkin park</span></li>
+      <li class="music-item reveal" style="transition-delay:0.54s"><span class="music-name">snow strippers</span></li>
+    </ul>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 5: REDES SOCIAIS
+       Para editar links: altere os atributos href abaixo.
+       Para o Discord (sem link), o clique copia o username.
+  ============================================================= -->
+  <section class="section socials-section" id="socials">
+    <div class="socials-grid">
+
+      <a class="social-card reveal s1" href="https://www.tiktok.com/@scauttt?_r=1&_t=ZS-95Ntzj7Xfj2" target="_blank" rel="noopener">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z" fill="currentColor"/>
+        </svg>
+        <span class="social-name">tiktok</span>
+        <span class="social-handle">@scauttt</span>
+      </a>
+
+      <a class="social-card reveal s2" href="https://boxd.it/hJiHh" target="_blank" rel="noopener">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10.5 3a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zm-9 7.5a9 9 0 1 1 18 0 9 9 0 0 1-18 0z" fill="currentColor"/>
+          <path d="M15.914 7.257a.75.75 0 0 1 .829 1.243l-8.25 5.5a.75.75 0 1 1-.829-1.243l8.25-5.5z" fill="currentColor"/>
+          <path d="M7.664 7.257a.75.75 0 0 0-.829 1.243l8.25 5.5a.75.75 0 1 0 .829-1.243l-8.25-5.5z" fill="currentColor"/>
+        </svg>
+        <span class="social-name">letterboxd</span>
+        <span class="social-handle">filmes que importam</span>
+      </a>
+
+      <div class="social-card reveal s3" id="discord-card" title="clique para copiar">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" fill="currentColor"/>
+        </svg>
+        <span class="social-name">discord</span>
+        <span class="social-handle" id="discord-handle">sc6utxx</span>
+        <span class="social-copied" id="discord-copied">copiado</span>
+      </div>
+
+      <a class="social-card reveal s4" href="https://steamcommunity.com/profiles/76561199091631875" target="_blank" rel="noopener">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.497 1.009 2.455-.397.957-1.494 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.252 0-2.265-1.014-2.265-2.265z" fill="currentColor"/>
+        </svg>
+        <span class="social-name">steam</span>
+        <span class="social-handle">perfil</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ELEMENTO SECRETO
+       Área invisível no rodapé. Ao clicar, revela uma mensagem.
+       Para trocar a mensagem: edite o texto dentro de #secret-msg
+       Para trocar o texto do trigger: edite .secret-trigger
+  ============================================================= -->
+  <section class="section footer-section" id="footer">
+    <div class="footer-content">
+      <p class="footer-year reveal">mmxxvi</p>
+      <span class="secret-trigger reveal" id="secret-trigger" title="">∴</span>
+      <p class="secret-hint reveal">há algo escondido aqui.</p>
+      <button class="secret-page-btn reveal" id="open-secret-page" title="">?</button>
+    </div>
+  </section>
+
+  <!-- Overlay da mensagem secreta -->
+  <div class="secret-overlay" id="secret-overlay">
+    <div class="secret-msg" id="secret-msg">
+      <!-- =====================================================
+           MENSAGEM SECRETA
+           Edite o texto abaixo à vontade.
+      ====================================================== -->
+      <p class="secret-line">você encontrou isso.</p>
+      <p class="secret-line">não era pra qualquer um.</p>
+      <p class="secret-line secondary">— obrigado por estar aqui.</p>
+      <button class="secret-close" id="secret-close">fechar</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA SECRETA (overlay full-screen)
+       Ativada pelo botão ? no rodapé.
+       Tudo vive aqui dentro — sem arquivos externos.
+
+       MÚSICA: coloque em secret/music/bg.mp3
+       IMAGENS: coloque em secret/images/
+         Substitua cada <div class="sp-placeholder"> por:
+         <img src="secret/images/NOME.jpg" alt="" />
+         dentro do respectivo .sp-polaroid
+  ============================================================= -->
+  <div id="secret-page" aria-hidden="true">
+
+    <!-- Grain próprio da página secreta -->
+    <canvas id="sp-grain"></canvas>
+    <!-- Vinheta -->
+    <div class="sp-vignette"></div>
+
+    <!-- Música secreta — separada da música principal -->
+    <audio id="sp-audio" loop>
+      <source src="secret/music/bg.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- Controles fixos -->
+    <button class="sp-close" id="sp-close" title="fechar">←</button>
+    <button class="sp-mute" id="sp-mute" title="som">
+      <span id="sp-mute-icon">♩</span>
+    </button>
+
+    <!-- Conteúdo -->
+    <div class="sp-main">
+
+      <header class="sp-header">
+        <p class="sp-date" id="sp-date">—</p>
+        <h1 class="sp-title">arquivo <span class="sp-redacted">██████</span></h1>
+      </header>
+
+      <!-- Galeria de polaroids — secret/images/sp01.jpg … sp12.jpg -->
+      <section class="sp-gallery">
+
+        <div class="sp-polaroid sp-p1">
+          <div class="sp-inner"><img src="secret/images/sp01.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p2">
+          <div class="sp-inner"><img src="secret/images/sp02.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p3">
+          <div class="sp-inner"><img src="secret/images/sp03.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p4">
+          <div class="sp-inner"><img src="secret/images/sp04.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p5">
+          <div class="sp-inner"><img src="secret/images/sp05.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p6">
+          <div class="sp-inner"><img src="secret/images/sp06.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p7">
+          <div class="sp-inner"><img src="secret/images/sp07.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p8">
+          <div class="sp-inner"><img src="secret/images/sp08.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p9">
+          <div class="sp-inner"><img src="secret/images/sp09.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p10">
+          <div class="sp-inner"><img src="secret/images/sp10.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p11">
+          <div class="sp-inner"><img src="secret/images/sp11.jpg" alt="" /></div>
+        </div>
+
+        <div class="sp-polaroid sp-p12">
+          <div class="sp-inner"><img src="secret/images/sp12.jpg" alt="" /></div>
+        </div>
+
+      </section>
+
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
