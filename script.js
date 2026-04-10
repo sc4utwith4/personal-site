@@ -117,6 +117,102 @@ function initGrain() {
 initGrain();
 
 // ================================================================
+// 3. RELÂMPAGOS (tema padrão)
+// ================================================================
+
+function initStorm() {
+  const canvas = document.getElementById('storm-canvas');
+  const ctx    = canvas.getContext('2d');
+  let w, h;
+
+  function resize() {
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Desenha um raio recursivo ramificado
+  function drawBolt(x1, y1, x2, y2, depth) {
+    if (depth === 0) return;
+    const mx = (x1 + x2) / 2 + (Math.random() - 0.5) * (Math.abs(x2 - x1) * 0.8);
+    const my = (y1 + y2) / 2 + (Math.random() - 0.5) * 20;
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(mx, my);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = `rgba(210, 220, 255, ${0.12 * depth})`;
+    ctx.lineWidth   = depth * 0.5;
+    ctx.stroke();
+
+    if (depth > 1 && Math.random() > 0.5) {
+      const branchX = mx + (Math.random() - 0.5) * 120;
+      const branchY = my + Math.random() * 80;
+      drawBolt(mx, my, branchX, branchY, depth - 1);
+    }
+
+    drawBolt(x1, y1, mx, my, depth - 1);
+    drawBolt(mx, my, x2, y2, depth - 1);
+  }
+
+  function flash() {
+    if (document.body.classList.contains('cyber')) return;
+
+    const x     = Math.random() * w;
+    const endY  = h * (0.4 + Math.random() * 0.4);
+    const alpha = 0.18 + Math.random() * 0.22;
+
+    // Flash de fundo difuso
+    ctx.fillStyle = `rgba(180, 195, 255, ${alpha * 0.08})`;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    ctx.shadowBlur  = 18;
+    ctx.shadowColor = 'rgba(180, 200, 255, 0.6)';
+    drawBolt(x, 0, x + (Math.random() - 0.5) * 180, endY, 5);
+    ctx.restore();
+
+    // Apaga gradualmente
+    let fadeSteps = 8;
+    const fadeOut = setInterval(() => {
+      ctx.fillStyle = `rgba(0, 0, 0, ${0.25 + Math.random() * 0.1})`;
+      ctx.fillRect(0, 0, w, h);
+      fadeSteps--;
+      if (fadeSteps <= 0) {
+        ctx.clearRect(0, 0, w, h);
+        clearInterval(fadeOut);
+      }
+    }, 40);
+
+    // Às vezes um segundo flash rápido (efeito realista)
+    if (Math.random() > 0.55) {
+      setTimeout(() => {
+        if (document.body.classList.contains('cyber')) return;
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        ctx.shadowBlur  = 10;
+        ctx.shadowColor = 'rgba(180, 200, 255, 0.4)';
+        drawBolt(x + (Math.random() - 0.5) * 30, 0, x + (Math.random() - 0.5) * 200, endY * 0.9, 4);
+        ctx.restore();
+        setTimeout(() => ctx.clearRect(0, 0, w, h), 80);
+      }, 120 + Math.random() * 80);
+    }
+
+    scheduleNext();
+  }
+
+  function scheduleNext() {
+    setTimeout(flash, 3000 + Math.random() * 9000);
+  }
+
+  // Primeiro raio com delay
+  setTimeout(flash, 2000 + Math.random() * 4000);
+}
+
+initStorm();
+
+// ================================================================
 // 3. NEVE (tema padrão)
 // ================================================================
 
