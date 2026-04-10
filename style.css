@@ -1110,7 +1110,7 @@ body.cyber #snow-canvas { opacity: 0; }
   top: 0; left: 0;
   width: 100%; height: 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
   opacity: 1;
   transition: opacity 1s ease;
 }
@@ -1123,12 +1123,13 @@ body.cyber #storm-canvas { opacity: 0; }
   width: 100%;
   height: 38vh;
   pointer-events: none;
-  z-index: 3;
+  z-index: 0;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   padding: 0 2vw;
-  opacity: 1;
+  opacity: 0.45;
+  filter: blur(3px);
   transition: opacity 1s ease;
 }
 body.cyber #trees-layer { opacity: 0; }
