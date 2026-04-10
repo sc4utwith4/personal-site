@@ -231,7 +231,59 @@ a, button { cursor: none; }
   color: var(--text);
   text-transform: lowercase;
   line-height: 1.1;
+  position: relative;
+  animation: title-shake 8s infinite;
 }
+
+.hero-title::before,
+.hero-title::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  color: var(--text);
+  opacity: 0;
+}
+
+.hero-title::before { animation: title-ghost-a 8s infinite; }
+.hero-title::after  { animation: title-ghost-b 8s infinite; }
+
+@keyframes title-shake {
+  0%,  88%  { transform: translate(0, 0); }
+  88.5%     { transform: translate(-2px, 1px); }
+  89%       { transform: translate(2px, -1px); }
+  89.5%     { transform: translate(-1px, 0px); }
+  90%       { transform: translate(1px, 1px); }
+  90.5%     { transform: translate(0, -1px); }
+  91%       { transform: translate(-2px, 0); }
+  91.4%     { transform: translate(0, 0); }
+  100%      { transform: translate(0, 0); }
+}
+
+@keyframes title-ghost-a {
+  0%,  88%  { opacity: 0; transform: translate(0, 0); clip-path: none; }
+  88.5%     { opacity: 0.6; transform: translate(-3px, 0); clip-path: polygon(0 20%, 100% 20%, 100% 45%, 0 45%); }
+  89.2%     { opacity: 0; transform: translate(0, 0); clip-path: none; }
+  90.2%     { opacity: 0.4; transform: translate(2px, 0); clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); }
+  90.7%     { opacity: 0; transform: translate(0, 0); clip-path: none; }
+  100%      { opacity: 0; }
+}
+
+@keyframes title-ghost-b {
+  0%,  89%  { opacity: 0; transform: translate(0, 0); clip-path: none; }
+  89.3%     { opacity: 0.5; transform: translate(3px, 0); clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%); }
+  89.8%     { opacity: 0; transform: translate(0, 0); clip-path: none; }
+  91%       { opacity: 0.35; transform: translate(-2px, 0); clip-path: polygon(0 10%, 100% 10%, 100% 30%, 0 30%); }
+  91.3%     { opacity: 0; transform: translate(0, 0); clip-path: none; }
+  100%      { opacity: 0; }
+}
+
+body.cyber .hero-title::before,
+body.cyber .hero-title::after {
+  animation: none;
+  opacity: 0;
+}
+body.cyber .hero-title { animation: glitch 4s infinite; }
 
 .hero-sub {
   font-size: 0.7rem;
