@@ -267,11 +267,14 @@ function fadeVolume(audioEl, from, to, duration, callback) {
   const stepVal  = (to - from) / steps;
   let   current  = from;
 
-  const interval = setInterval(() => {
+  // Limpa intervalos anteriores no mesmo elemento para evitar conflito
+  if (audioEl.fadeInterval) clearInterval(audioEl.fadeInterval);
+
+  audioEl.fadeInterval = setInterval(() => {
     current += stepVal;
     if ((stepVal > 0 && current >= to) || (stepVal < 0 && current <= to)) {
       audioEl.volume = Math.max(0, Math.min(1, to));
-      clearInterval(interval);
+      clearInterval(audioEl.fadeInterval);
       if (callback) callback();
     } else {
       audioEl.volume = Math.max(0, Math.min(1, current));
@@ -285,8 +288,11 @@ function unlockCyberAudio() {
   cyberUnlocked = true;
   cyberAudio.volume = 0;
   cyberAudio.play().then(() => {
-    cyberAudio.pause();
-    cyberAudio.currentTime = 0;
+    // Se não estiver no tema cyber, paralisa, para não tocar junto com background
+    if (!isCyber) {
+        cyberAudio.pause();
+        cyberAudio.currentTime = 0;
+    }
   }).catch(() => { cyberUnlocked = false; });
 }
 
@@ -305,13 +311,16 @@ function tryAutoplay() {
       const events = ['touchstart', 'touchend', 'click', 'keydown'];
       function startOnInteraction(e) {
         if (e.target === muteBtn || muteBtn.contains(e.target)) return;
-        // Desbloqueia cyberAudio junto com o audio principal
+        
         unlockCyberAudio();
-        audio.volume = 0;
-        audio.play().then(() => {
+        
+        // Se o tema atual for cyber, apenas interage com o cyber e não bg
+        const activeAudio = isCyber ? cyberAudio : audio;
+        activeAudio.volume = 0;
+        activeAudio.play().then(() => {
           isPlaying = true;
           isMuted   = false;
-          fadeVolume(audio, 0, INITIAL_VOLUME, 1500);
+          fadeVolume(activeAudio, 0, INITIAL_VOLUME, 1500);
           updateMuteBtn();
         }).catch(() => {});
         events.forEach(ev => document.removeEventListener(ev, startOnInteraction));
@@ -363,30 +372,29 @@ themeToggle.addEventListener('click', () => {
     matrix.start();
     // Para Crystal Castles
     audio.pause();
-    audio.volume = 0;
-    // Inicia Snow Strippers
-    cyberAudio.currentTime = 0;
-    cyberAudio.volume = 0;
-    cyberAudio.play().then(() => {
-      isPlaying = true;
-      isMuted   = false;
-      fadeVolume(cyberAudio, 0, INITIAL_VOLUME, 1200);
-      updateMuteBtn();
-    }).catch(() => {});
+    
+    // Inicia Snow Strippers, respeitando se estava tocando ou se quer iniciar agr
+    if (isPlaying && !isMuted) {
+        cyberAudio.currentTime = 0;
+        cyberAudio.volume = 0;
+        cyberAudio.play().then(() => {
+            fadeVolume(cyberAudio, 0, INITIAL_VOLUME, 1200);
+            updateMuteBtn();
+        }).catch(() => {});
+    }
   } else {
     matrix.stop();
     // Para Snow Strippers
     cyberAudio.pause();
-    cyberAudio.volume = 0;
-    cyberAudio.currentTime = 0;
+    
     // Retoma Crystal Castles
-    audio.volume = 0;
-    audio.play().then(() => {
-      isPlaying = true;
-      isMuted   = false;
-      fadeVolume(audio, 0, INITIAL_VOLUME, 1200);
-      updateMuteBtn();
-    }).catch(() => {});
+    if (isPlaying && !isMuted) {
+        audio.volume = 0;
+        audio.play().then(() => {
+            fadeVolume(audio, 0, INITIAL_VOLUME, 1200);
+            updateMuteBtn();
+        }).catch(() => {});
+    }
   }
 
   document.querySelectorAll('.reveal.visible').forEach(el => {
