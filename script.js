@@ -268,8 +268,29 @@ themeToggle.addEventListener('click', () => {
 
   if (isCyber) {
     matrix.start();
+    // Troca para Snow Strippers
+    if (isPlaying && !isMuted) {
+      fadeVolume(audio, audio.volume, 0, 600, () => {
+        audio.pause();
+        cyberAudio.volume = 0;
+        cyberAudio.play().then(() => {
+          fadeVolume(cyberAudio, 0, INITIAL_VOLUME, 1200);
+        }).catch(() => {});
+      });
+    }
   } else {
     matrix.stop();
+    // Volta para Crystal Castles
+    if (isPlaying && !isMuted) {
+      fadeVolume(cyberAudio, cyberAudio.volume, 0, 600, () => {
+        cyberAudio.pause();
+        cyberAudio.currentTime = 0;
+        audio.volume = 0;
+        audio.play().then(() => {
+          fadeVolume(audio, 0, INITIAL_VOLUME, 1200);
+        }).catch(() => {});
+      });
+    }
   }
 
   // Re-observa elementos para re-disparar animações
@@ -293,6 +314,7 @@ themeToggle.addEventListener('click', () => {
 const INITIAL_VOLUME = 0.08;
 
 const audio      = document.getElementById('bg-audio');
+const cyberAudio = document.getElementById('cyber-audio');
 const muteBtn    = document.getElementById('mute-btn');
 const iconPlay   = document.getElementById('icon-play');
 const iconPause  = document.getElementById('icon-pause');
@@ -576,6 +598,8 @@ function openSecretPage() {
   // Para o áudio principal imediatamente (garante no mobile)
   audio.pause();
   audio.volume = 0;
+  cyberAudio.pause();
+  cyberAudio.volume = 0;
   // Inicia música secreta após delay atmosférico
   setTimeout(spTryPlay, 700);
 }
@@ -600,11 +624,12 @@ function closeSecretPage() {
       spUpdateMute();
     });
   }
-  // Retoma música principal se estava tocando antes
+  // Retoma música do tema ativo se estava tocando antes
   if (isPlaying && !isMuted) {
-    audio.volume = 0;
-    audio.play().then(() => {
-      fadeVolume(audio, 0, INITIAL_VOLUME, 1000);
+    const activeAudio = isCyber ? cyberAudio : audio;
+    activeAudio.volume = 0;
+    activeAudio.play().then(() => {
+      fadeVolume(activeAudio, 0, INITIAL_VOLUME, 1000);
     }).catch(() => {});
   }
 }
