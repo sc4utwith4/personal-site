@@ -500,49 +500,68 @@ function initHeroAnimations() {
   }, 200);
 }
 
-// Hero title — letras se despedaçando a cada 5s
+// Hero title — letras se despedaçando em estilhaços a cada 5s
 function initTitleScatter() {
   const title = document.querySelector('.hero-title');
   if (!title) return;
 
-  const text = title.textContent;
+  const text = title.textContent.trim();
 
-  // Substitui o conteúdo por spans individuais por letra
-  title.innerHTML = text.split('').map(ch =>
-    ch === ' '
-      ? '<span class="tl" style="display:inline-block;white-space:pre"> </span>'
-      : `<span class="tl" style="display:inline-block">${ch}</span>`
-  ).join('');
+  // Para cada letra, cria 4 estilhaços triangulares com clip-path
+  // que juntos cobrem o caractere inteiro
+  title.innerHTML = text.split('').map(ch => {
+    if (ch === ' ') {
+      return '<span class="tl-wrap" style="display:inline-block;white-space:pre"> </span>';
+    }
+
+    // Ponto de fratura aleatório por letra
+    const cx = 30 + Math.random() * 40;
+    const cy = 25 + Math.random() * 50;
+
+    // 4 triângulos que se encontram em (cx, cy) e cobrem o bounding box
+    const clips = [
+      `polygon(0% 0%, 100% 0%, ${cx}% ${cy}%)`,           // topo
+      `polygon(100% 0%, 100% 100%, ${cx}% ${cy}%)`,        // direita
+      `polygon(100% 100%, 0% 100%, ${cx}% ${cy}%)`,        // base
+      `polygon(0% 100%, 0% 0%, ${cx}% ${cy}%)`,            // esquerda
+    ];
+
+    const shards = clips.map(clip =>
+      `<span class="tl-shard" style="position:absolute;inset:0;clip-path:${clip}">${ch}</span>`
+    ).join('');
+
+    // tl-sp: caractere invisível que dá dimensão ao wrapper
+    return `<span class="tl-wrap" style="display:inline-block;position:relative">` +
+           `<span class="tl-sp" style="visibility:hidden">${ch}</span>${shards}</span>`;
+  }).join('');
 
   function scatter() {
     if (document.body.classList.contains('cyber')) return;
 
-    const spans = title.querySelectorAll('.tl');
-
     title.style.animation = 'none';
+    const shards = title.querySelectorAll('.tl-shard');
 
-    // Fase 1: explode
-    spans.forEach(sp => {
-      const dx  = (Math.random() - 0.5) * 600;
-      const dy  = (Math.random() - 0.5) * 400;
-      const rot = (Math.random() - 0.5) * 720;
-      sp.style.transition = 'transform 0.55s cubic-bezier(0.55,0,1,0.45), opacity 0.55s ease';
+    // Fase 1: estilhaços voam para todos os lados
+    shards.forEach(sp => {
+      const dx  = (Math.random() - 0.5) * 900;
+      const dy  = (Math.random() - 0.5) * 600;
+      const rot = (Math.random() - 0.5) * 1080;
+      sp.style.transition = 'transform 0.55s cubic-bezier(0.6,0,1,0.5), opacity 0.45s ease';
       sp.style.transform  = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
       sp.style.opacity    = '0';
     });
 
-    // Fase 2: volta
+    // Fase 2: volta e se reconstrói
     setTimeout(() => {
-      spans.forEach(sp => {
-        sp.style.transition = 'transform 0.7s cubic-bezier(0.2,0.8,0.3,1), opacity 0.7s ease';
+      shards.forEach(sp => {
+        sp.style.transition = 'transform 0.75s cubic-bezier(0.15,0.85,0.3,1), opacity 0.75s ease';
         sp.style.transform  = 'translate(0,0) rotate(0deg)';
         sp.style.opacity    = '1';
       });
-      setTimeout(() => { title.style.animation = ''; }, 800);
-    }, 700);
+      setTimeout(() => { title.style.animation = ''; }, 900);
+    }, 750);
   }
 
-  // Primeiro disparo depois do reveal inicial
   setTimeout(() => {
     scatter();
     setInterval(scatter, 5000);
