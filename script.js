@@ -495,10 +495,58 @@ setTimeout(tryAutoplay, 800);
 // Hero — inicia visível após delay
 function initHeroAnimations() {
   const heroEls = document.querySelectorAll('.hero .fade-in-up');
-  // Pequeno delay para o fade inicial
   setTimeout(() => {
     heroEls.forEach(el => el.classList.add('visible'));
   }, 200);
+}
+
+// Hero title — letras se despedaçando a cada 5s
+function initTitleScatter() {
+  const title = document.querySelector('.hero-title');
+  if (!title) return;
+
+  const text = title.textContent;
+
+  // Substitui o conteúdo por spans individuais por letra
+  title.innerHTML = text.split('').map(ch =>
+    ch === ' '
+      ? '<span class="tl" style="display:inline-block;white-space:pre"> </span>'
+      : `<span class="tl" style="display:inline-block">${ch}</span>`
+  ).join('');
+
+  function scatter() {
+    if (document.body.classList.contains('cyber')) return;
+
+    const spans = title.querySelectorAll('.tl');
+
+    title.style.animation = 'none';
+
+    // Fase 1: explode
+    spans.forEach(sp => {
+      const dx  = (Math.random() - 0.5) * 600;
+      const dy  = (Math.random() - 0.5) * 400;
+      const rot = (Math.random() - 0.5) * 720;
+      sp.style.transition = 'transform 0.55s cubic-bezier(0.55,0,1,0.45), opacity 0.55s ease';
+      sp.style.transform  = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+      sp.style.opacity    = '0';
+    });
+
+    // Fase 2: volta
+    setTimeout(() => {
+      spans.forEach(sp => {
+        sp.style.transition = 'transform 0.7s cubic-bezier(0.2,0.8,0.3,1), opacity 0.7s ease';
+        sp.style.transform  = 'translate(0,0) rotate(0deg)';
+        sp.style.opacity    = '1';
+      });
+      setTimeout(() => { title.style.animation = ''; }, 800);
+    }, 700);
+  }
+
+  // Primeiro disparo depois do reveal inicial
+  setTimeout(() => {
+    scatter();
+    setInterval(scatter, 5000);
+  }, 3000);
 }
 
 // Intersection Observer para elementos .reveal
@@ -526,6 +574,7 @@ function initScrollReveal() {
 }
 
 initHeroAnimations();
+initTitleScatter();
 initScrollReveal();
 
 // ================================================================
