@@ -240,25 +240,9 @@ const iconPlay   = document.getElementById('icon-play');
 const iconPause  = document.getElementById('icon-pause');
 const muteLabel  = document.getElementById('mute-label');
 
+// Variáveis de controle globais
 let isPlaying = false;
 let isMuted   = false;
-let cyberUnlocked = false;
-
-audio.volume = INITIAL_VOLUME;
-
-function updateMuteBtn() {
-  if (isPlaying && !isMuted) {
-    muteBtn.classList.add('playing');
-    iconPlay.classList.add('hidden');
-    iconPause.classList.remove('hidden');
-    muteLabel.textContent = 'pausar';
-  } else {
-    muteBtn.classList.remove('playing');
-    iconPlay.classList.remove('hidden');
-    iconPause.classList.add('hidden');
-    muteLabel.textContent = 'música';
-  }
-}
 
 // Fade de volume suave
 function fadeVolume(audioEl, from, to, duration, callback) {
@@ -267,7 +251,6 @@ function fadeVolume(audioEl, from, to, duration, callback) {
   const stepVal  = (to - from) / steps;
   let   current  = from;
 
-  // Limpa intervalos anteriores no mesmo elemento para evitar conflito
   if (audioEl.fadeInterval) clearInterval(audioEl.fadeInterval);
 
   audioEl.fadeInterval = setInterval(() => {
@@ -282,18 +265,20 @@ function fadeVolume(audioEl, from, to, duration, callback) {
   }, stepTime);
 }
 
-// Desbloqueia cyberAudio na mesma janela de gesto do usuário
-function unlockCyberAudio() {
-  if (cyberUnlocked) return;
-  cyberUnlocked = true;
-  cyberAudio.volume = 0;
-  cyberAudio.play().then(() => {
-    // Se não estiver no tema cyber, paralisa, para não tocar junto com background
-    if (!isCyber) {
-        cyberAudio.pause();
-        cyberAudio.currentTime = 0;
-    }
-  }).catch(() => { cyberUnlocked = false; });
+// Inicializa ou retoma a música baseada no tema
+function playCurrentThemeMusic() {
+  const activeAudio = isCyber ? cyberAudio : audio;
+  activeAudio.volume = 0;
+  activeAudio.play().then(() => {
+    isPlaying = true;
+    isMuted   = false;
+    fadeVolume(activeAudio, 0, INITIAL_VOLUME, 1200);
+    updateMuteBtn();
+  }).catch(() => {
+    // Autoplay bloqueado ou erro do navegador
+    isPlaying = false;
+    updateMuteBtn();
+  });
 }
 
 function tryAutoplay() {
@@ -301,28 +286,19 @@ function tryAutoplay() {
   audio.play()
     .then(() => {
       isPlaying = true;
-      unlockCyberAudio();
       fadeVolume(audio, 0, INITIAL_VOLUME, 1500);
       updateMuteBtn();
     })
     .catch(() => {
       isPlaying = false;
       updateMuteBtn();
+      
       const events = ['touchstart', 'touchend', 'click', 'keydown'];
       function startOnInteraction(e) {
         if (e.target === muteBtn || muteBtn.contains(e.target)) return;
-        
-        unlockCyberAudio();
-        
-        // Se o tema atual for cyber, apenas interage com o cyber e não bg
-        const activeAudio = isCyber ? cyberAudio : audio;
-        activeAudio.volume = 0;
-        activeAudio.play().then(() => {
-          isPlaying = true;
-          isMuted   = false;
-          fadeVolume(activeAudio, 0, INITIAL_VOLUME, 1500);
-          updateMuteBtn();
-        }).catch(() => {});
+        if (!isMuted && !isPlaying) {
+             playCurrentThemeMusic();
+        }
         events.forEach(ev => document.removeEventListener(ev, startOnInteraction));
       }
       events.forEach(ev => document.addEventListener(ev, startOnInteraction));
@@ -331,25 +307,23 @@ function tryAutoplay() {
 
 muteBtn.addEventListener('click', () => {
   const activeAudio = isCyber ? cyberAudio : audio;
-  if (!isPlaying) {
-    activeAudio.volume = 0;
-    activeAudio.play().then(() => {
-      isPlaying = true;
-      isMuted   = false;
-      fadeVolume(activeAudio, 0, INITIAL_VOLUME, 800);
-      updateMuteBtn();
-    }).catch(() => {});
-  } else if (!isMuted) {
-    isMuted = true;
-    fadeVolume(activeAudio, activeAudio.volume, 0, 500, () => activeAudio.pause());
-    updateMuteBtn();
-  } else {
+  
+  if (!isPlaying || isMuted) {
+    // Retomar música
     isMuted = false;
     activeAudio.volume = 0;
     activeAudio.play().then(() => {
+      isPlaying = true;
       fadeVolume(activeAudio, 0, INITIAL_VOLUME, 800);
-    }).catch(() => {});
-    updateMuteBtn();
+      updateMuteBtn();
+    }).catch(console.error);
+  } else {
+    // Mutar música
+    isMuted = true;
+    fadeVolume(activeAudio, activeAudio.volume, 0, 500, () => {
+      activeAudio.pause();
+      updateMuteBtn();
+    });
   }
 });
 
@@ -368,33 +342,26 @@ themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('cyber', isCyber);
   themeLabel.textContent = isCyber ? 'cyber' : 'clima';
 
+  // Paralisa qualquer áudio anterior
+  audio.pause();
+  cyberAudio.pause();
+
   if (isCyber) {
     matrix.start();
-    // Para Crystal Castles
-    audio.pause();
-    
-    // Inicia Snow Strippers, respeitando se estava tocando ou se quer iniciar agr
-    if (isPlaying && !isMuted) {
-        cyberAudio.currentTime = 0;
-        cyberAudio.volume = 0;
-        cyberAudio.play().then(() => {
-            fadeVolume(cyberAudio, 0, INITIAL_VOLUME, 1200);
-            updateMuteBtn();
-        }).catch(() => {});
-    }
   } else {
     matrix.stop();
-    // Para Snow Strippers
-    cyberAudio.pause();
-    
-    // Retoma Crystal Castles
-    if (isPlaying && !isMuted) {
-        audio.volume = 0;
-        audio.play().then(() => {
-            fadeVolume(audio, 0, INITIAL_VOLUME, 1200);
-            updateMuteBtn();
-        }).catch(() => {});
-    }
+  }
+
+  // Tentar tocar a nova faixa se ele não estivesse mutado pelo uduário
+  if (!isMuted) {
+    const activeAudio = isCyber ? cyberAudio : audio;
+    activeAudio.currentTime = 0;
+    activeAudio.volume = 0;
+    activeAudio.play().then(() => {
+        isPlaying = true;
+        fadeVolume(activeAudio, 0, INITIAL_VOLUME, 1200);
+        updateMuteBtn();
+    }).catch(console.error);
   }
 
   document.querySelectorAll('.reveal.visible').forEach(el => {
