@@ -268,28 +268,29 @@ themeToggle.addEventListener('click', () => {
 
   if (isCyber) {
     matrix.start();
-    // Troca para Snow Strippers
-    if (isPlaying && !isMuted) {
-      fadeVolume(audio, audio.volume, 0, 600, () => {
-        audio.pause();
-        cyberAudio.volume = 0;
-        cyberAudio.play().then(() => {
-          fadeVolume(cyberAudio, 0, INITIAL_VOLUME, 1200);
-        }).catch(() => {});
-      });
-    }
+    // Para Crystal Castles e inicia Snow Strippers
+    fadeVolume(audio, audio.volume, 0, 400, () => audio.pause());
+    cyberAudio.volume = 0;
+    cyberAudio.play().then(() => {
+      isPlaying = true;
+      isMuted   = false;
+      fadeVolume(cyberAudio, 0, INITIAL_VOLUME, 1200);
+      updateMuteBtn();
+    }).catch(() => {});
   } else {
     matrix.stop();
-    // Volta para Crystal Castles
-    if (isPlaying && !isMuted) {
-      fadeVolume(cyberAudio, cyberAudio.volume, 0, 600, () => {
-        cyberAudio.pause();
-        cyberAudio.currentTime = 0;
-        audio.volume = 0;
-        audio.play().then(() => {
-          fadeVolume(audio, 0, INITIAL_VOLUME, 1200);
-        }).catch(() => {});
-      });
+    // Para Snow Strippers e retoma Crystal Castles
+    fadeVolume(cyberAudio, cyberAudio.volume, 0, 400, () => {
+      cyberAudio.pause();
+      cyberAudio.currentTime = 0;
+    });
+    if (!isMuted) {
+      audio.volume = 0;
+      audio.play().then(() => {
+        isPlaying = true;
+        fadeVolume(audio, 0, INITIAL_VOLUME, 1200);
+        updateMuteBtn();
+      }).catch(() => {});
     }
   }
 
