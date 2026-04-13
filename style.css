@@ -15,22 +15,20 @@
 ================================================================ */
 
 :root {
-  --bg: #0d0e12;
-  --surface: rgba(200, 208, 228, 0.028);
-  --surface-hover: rgba(200, 208, 228, 0.055);
-  --accent: rgba(158, 168, 198, 0.70);
-  --accent-light: rgba(188, 198, 222, 0.86);
-  --accent-blue: #0e1018;
-  --accent-glow: rgba(148, 162, 205, 0.065);
-  --text: rgba(214, 218, 232, 0.80);
-  --text-muted: rgba(168, 175, 202, 0.30);
-  --text-faint: rgba(148, 156, 185, 0.14);
-  --border: rgba(185, 192, 220, 0.058);
-  --border-glow: rgba(165, 175, 215, 0.16);
+  --bg: #05000f;
+  --surface: rgba(255, 200, 0, 0.03);
+  --surface-hover: rgba(255, 200, 0, 0.065);
+  --accent: rgba(255, 200, 20, 0.85);
+  --accent-light: rgba(255, 218, 60, 0.95);
+  --accent-blue: #0a0018;
+  --accent-glow: rgba(255, 185, 0, 0.10);
+  --text: rgba(255, 228, 175, 0.82);
+  --text-muted: rgba(255, 195, 70, 0.38);
+  --text-faint: rgba(255, 180, 40, 0.16);
+  --border: rgba(255, 195, 0, 0.10);
+  --border-glow: rgba(255, 195, 0, 0.32);
 
-  /* TIPOGRAFIA: troque a fonte aqui */
   --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-
   --radius: 4px;
   --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -373,7 +371,9 @@ a, button { cursor: none; }
   text-align: center;
   padding: 0;
   background:
-    radial-gradient(ellipse at 50% 55%, #1a1e2e 0%, #131620 45%, var(--bg) 78%);
+    radial-gradient(ellipse at 30% 70%, rgba(200,0,255,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 30%, rgba(255,120,0,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 55%, #160025 0%, #0d0018 40%, var(--bg) 76%);
   overflow: hidden;
 }
 
@@ -454,9 +454,12 @@ body.cyber .hero-title { animation: glitch 4s infinite; }
 /* Brilho difuso de fundo na hero */
 .hero-glow {
   position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(ellipse,
+    rgba(180,0,255,0.09) 0%,
+    rgba(255,100,0,0.05) 35%,
+    transparent 70%);
   border-radius: 50%;
   top: 50%;
   left: 50%;
@@ -1275,7 +1278,7 @@ body.cyber {
   background-color: var(--bg);
 }
 
-/* Névoa — camadas difusas que flutuam sobre o fundo */
+/* Névoa neon — smog da cidade cyberpunk */
 #fog-layer {
   position: fixed;
   inset: 0;
@@ -1284,9 +1287,10 @@ body.cyber {
   opacity: 1;
   transition: opacity 1s ease;
   background:
-    radial-gradient(ellipse 120% 60% at 15% 80%,  rgba(148,160,200,0.045) 0%, transparent 65%),
-    radial-gradient(ellipse 100% 50% at 85% 20%,  rgba(148,160,200,0.035) 0%, transparent 60%),
-    radial-gradient(ellipse 160% 40% at 50% 100%, rgba(160,170,210,0.055) 0%, transparent 55%);
+    radial-gradient(ellipse 130% 55% at 10% 90%,  rgba(180,0,255,0.06)  0%, transparent 60%),
+    radial-gradient(ellipse 110% 45% at 90% 10%,  rgba(255,80,0,0.04)   0%, transparent 55%),
+    radial-gradient(ellipse 160% 35% at 50% 100%, rgba(255,0,120,0.055) 0%, transparent 50%),
+    radial-gradient(ellipse 80%  30% at 30% 50%,  rgba(0,100,255,0.025) 0%, transparent 60%);
   animation: fog-drift 18s ease-in-out infinite alternate;
 }
 
@@ -1326,52 +1330,16 @@ body.cyber #snow-canvas { opacity: 0; }
 }
 body.cyber #storm-canvas { opacity: 0; }
 
-#trees-layer {
+#skyline-canvas {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 38vh;
+  bottom: 0; left: 0;
+  width: 100%; height: 55vh;
   pointer-events: none;
   z-index: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 0 2vw;
-  opacity: 0.45;
-  filter: blur(3px);
+  opacity: 1;
   transition: opacity 1s ease;
 }
-body.cyber #trees-layer { opacity: 0; }
-
-.tree {
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 18px rgba(0,0,0,0.9));
-  transform-origin: bottom center;
-}
-
-#tree1 { height: 28vh; width: auto; animation: sway1 7s ease-in-out infinite; }
-#tree2 { height: 22vh; width: auto; animation: sway2 9s ease-in-out infinite; margin-bottom: 2vh; }
-#tree3 { height: 34vh; width: auto; animation: sway1 8s ease-in-out infinite reverse; }
-#tree4 { height: 26vh; width: auto; animation: sway2 6.5s ease-in-out infinite; margin-bottom: 1vh; }
-#tree5 { height: 31vh; width: auto; animation: sway1 10s ease-in-out infinite; }
-#tree6 { height: 20vh; width: auto; animation: sway2 7.5s ease-in-out infinite reverse; margin-bottom: 3vh; }
-
-@keyframes sway1 {
-  0%   { transform: rotate(0deg) skewX(0deg); }
-  20%  { transform: rotate(1.8deg) skewX(0.5deg); }
-  50%  { transform: rotate(-2.2deg) skewX(-0.6deg); }
-  75%  { transform: rotate(1.4deg) skewX(0.3deg); }
-  100% { transform: rotate(0deg) skewX(0deg); }
-}
-
-@keyframes sway2 {
-  0%   { transform: rotate(0deg) skewX(0deg); }
-  25%  { transform: rotate(-1.6deg) skewX(-0.4deg); }
-  55%  { transform: rotate(2.4deg) skewX(0.7deg); }
-  80%  { transform: rotate(-1.0deg) skewX(-0.2deg); }
-  100% { transform: rotate(0deg) skewX(0deg); }
-}
+body.cyber #skyline-canvas { opacity: 0; }
 
 /* Matrix canvas visível no tema cyber */
 body.cyber #matrix-canvas { opacity: 1; }

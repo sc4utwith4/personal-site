@@ -224,7 +224,8 @@ function initStorm() {
     ctx.moveTo(x1, y1);
     ctx.lineTo(mx, my);
     ctx.lineTo(x2, y2);
-    ctx.strokeStyle = `rgba(210, 220, 255, ${0.12 * depth})`;
+    const rc = depth % 2 === 0 ? '180,80,255' : '80,180,255';
+    ctx.strokeStyle = `rgba(${rc}, ${0.13 * depth})`;
     ctx.lineWidth   = depth * 0.5;
     ctx.stroke();
 
@@ -245,13 +246,13 @@ function initStorm() {
     const endY  = h * (0.4 + Math.random() * 0.4);
     const alpha = 0.18 + Math.random() * 0.22;
 
-    // Flash de fundo difuso
-    ctx.fillStyle = `rgba(180, 195, 255, ${alpha * 0.08})`;
+    // Flash de fundo difuso — roxo/neon
+    ctx.fillStyle = `rgba(140, 0, 255, ${alpha * 0.06})`;
     ctx.fillRect(0, 0, w, h);
 
     ctx.save();
-    ctx.shadowBlur  = 18;
-    ctx.shadowColor = 'rgba(180, 200, 255, 0.6)';
+    ctx.shadowBlur  = 22;
+    ctx.shadowColor = 'rgba(160, 80, 255, 0.7)';
     drawBolt(x, 0, x + (Math.random() - 0.5) * 180, endY, 5);
     ctx.restore();
 
@@ -295,67 +296,72 @@ function initStorm() {
 initStorm();
 
 // ================================================================
-// 3. NEVE (tema padrão)
+// 3. CHUVA NEON — CP2077 (tema padrão)
 // ================================================================
 
-function initSnow() {
+function initNeonRain() {
   const canvas = document.getElementById('snow-canvas');
   const ctx    = canvas.getContext('2d');
-  let w, h, flakes;
+  let w, h, drops;
 
-  const COUNT = window.innerWidth < 600 ? 55 : 100;
+  const COUNT = window.innerWidth < 600 ? 90 : 200;
+
+  // Paleta CP2077: amarelo, azul elétrico, rosa, branco-frio
+  const PALETTE = [
+    [255, 205, 0],
+    [255, 205, 0],   // amarelo dobrado — predominante
+    [0,   195, 255],
+    [255, 30,  130],
+    [210, 225, 255],
+  ];
 
   function resize() {
     w = canvas.width  = window.innerWidth;
     h = canvas.height = window.innerHeight;
   }
 
-  function makeFlake() {
+  function makeDrop() {
+    const c = PALETTE[Math.floor(Math.random() * PALETTE.length)];
     return {
       x:     Math.random() * w,
-      y:     Math.random() * h - h,            // começa acima da tela
-      r:     Math.random() * 1.4 + 0.3,        // raio 0.3–1.7px
-      speed: Math.random() * 0.5 + 0.15,       // queda lenta
-      drift: (Math.random() - 0.5) * 0.25,     // deriva lateral suave
-      alpha: Math.random() * 0.45 + 0.08,      // opacidade discreta
-      sway:  Math.random() * Math.PI * 2,      // fase inicial do balanço
-      swaySpeed: Math.random() * 0.008 + 0.003 // velocidade do balanço
+      y:     Math.random() * h,
+      len:   10 + Math.random() * 55,
+      speed: 3 + Math.random() * 9,
+      alpha: 0.055 + Math.random() * 0.25,
+      r: c[0], g: c[1], b: c[2],
+      thick: 0.4 + Math.random() * 0.7,
     };
   }
 
-  function initFlakes() {
-    flakes = [];
-    for (let i = 0; i < COUNT; i++) {
-      const f = makeFlake();
-      f.y = Math.random() * h; // distribui pela tela no início
-      flakes.push(f);
-    }
+  function initDrops() {
+    drops = [];
+    for (let i = 0; i < COUNT; i++) drops.push(makeDrop());
   }
 
   resize();
-  initFlakes();
-  window.addEventListener('resize', () => { resize(); initFlakes(); });
+  initDrops();
+  window.addEventListener('resize', () => { resize(); initDrops(); });
 
   function draw() {
     ctx.clearRect(0, 0, w, h);
 
-    for (const f of flakes) {
-      f.sway += f.swaySpeed;
-      f.x    += Math.sin(f.sway) * 0.3 + f.drift;
-      f.y    += f.speed;
-
-      // Reseta quando sai da tela
-      if (f.y > h + 4) {
-        f.y = -4;
-        f.x = Math.random() * w;
+    for (const d of drops) {
+      d.y += d.speed;
+      if (d.y - d.len > h) {
+        d.y = -d.len;
+        d.x = Math.random() * w;
       }
-      if (f.x < -4) f.x = w + 4;
-      if (f.x > w + 4) f.x = -4;
+
+      const grad = ctx.createLinearGradient(d.x, d.y - d.len, d.x, d.y);
+      grad.addColorStop(0, `rgba(${d.r},${d.g},${d.b},0)`);
+      grad.addColorStop(1, `rgba(${d.r},${d.g},${d.b},${d.alpha})`);
 
       ctx.beginPath();
-      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(205, 212, 235, ${f.alpha})`;
-      ctx.fill();
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = d.thick;
+      ctx.moveTo(d.x, d.y - d.len);
+      ctx.lineTo(d.x, d.y);
+      ctx.stroke();
     }
 
     requestAnimationFrame(draw);
@@ -364,7 +370,155 @@ function initSnow() {
   draw();
 }
 
-initSnow();
+initNeonRain();
+
+// ================================================================
+// 3b. SKYLINE DA CIDADE — CP2077 (tema padrão)
+// ================================================================
+
+function initSkyline() {
+  const canvas = document.getElementById('skyline-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, buildings, frame = 0;
+
+  const WIN_COLORS = [
+    [255, 205, 0],   // amarelo
+    [0,   195, 255], // ciano
+    [255, 255, 210], // branco quente
+    [255, 80,  180], // pink
+  ];
+
+  function makeBuildings() {
+    buildings = [];
+    const ground = h;
+
+    // Camada traseira — prédios menores, mais apagados
+    let x = 0;
+    while (x < w) {
+      const bw = 18 + Math.random() * 55;
+      const bh = 30 + Math.random() * 110;
+      const wins = [];
+      const cols = Math.floor(bw / 9);
+      const rows = Math.floor(bh / 11);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (Math.random() > 0.6) {
+            const col = WIN_COLORS[Math.floor(Math.random() * WIN_COLORS.length)];
+            wins.push({ x: x + c * 9 + 2, y: ground - bh + r * 11 + 3,
+              r: col[0], g: col[1], b: col[2],
+              a: 0.12 + Math.random() * 0.22,
+              blink: Math.random() > 0.9,
+              on: true, timer: Math.random() * 180,
+            });
+          }
+        }
+      }
+      buildings.push({ x, y: ground - bh, w: bw, h: bh, layer: 0, wins });
+      x += bw + Math.random() * 6;
+    }
+
+    // Camada frontal — megatowers
+    x = -30;
+    while (x < w + 30) {
+      const bw = 28 + Math.random() * 95;
+      const bh = 80 + Math.random() * (h * 0.65);
+      const wins = [];
+      const cols = Math.floor(bw / 8);
+      const rows = Math.floor(bh / 10);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (Math.random() > 0.55) {
+            const col = WIN_COLORS[Math.floor(Math.random() * WIN_COLORS.length)];
+            wins.push({ x: x + c * 8 + 2, y: ground - bh + r * 10 + 2,
+              r: col[0], g: col[1], b: col[2],
+              a: 0.25 + Math.random() * 0.45,
+              blink: Math.random() > 0.88,
+              on: true, timer: Math.random() * 200,
+            });
+          }
+        }
+      }
+      const antenna = Math.random() > 0.55
+        ? { h: 12 + Math.random() * 50 }
+        : null;
+      buildings.push({ x, y: ground - bh, w: bw, h: bh, layer: 1, wins, antenna });
+      x += bw + Math.random() * 18;
+    }
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, w, h);
+    frame++;
+
+    // Camada 0 — fundo
+    for (const b of buildings) {
+      if (b.layer !== 0) continue;
+      ctx.fillStyle = 'rgba(8, 2, 18, 0.55)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      for (const win of b.wins) {
+        if (win.blink) {
+          win.timer--;
+          if (win.timer <= 0) { win.on = !win.on; win.timer = 40 + Math.random() * 160; }
+          if (!win.on) continue;
+        }
+        ctx.fillStyle = `rgba(${win.r},${win.g},${win.b},${win.a * 0.45})`;
+        ctx.fillRect(win.x, win.y, 4, 5);
+      }
+    }
+
+    // Camada 1 — frente
+    for (const b of buildings) {
+      if (b.layer !== 1) continue;
+      ctx.fillStyle = 'rgba(4, 0, 10, 0.94)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+
+      if (b.antenna) {
+        ctx.fillStyle = 'rgba(4, 0, 10, 0.98)';
+        ctx.fillRect(b.x + b.w / 2 - 1, b.y - b.antenna.h, 2, b.antenna.h);
+        const pulse = 0.5 + Math.sin(frame * 0.04 + b.x) * 0.45;
+        ctx.fillStyle = `rgba(255, 40, 40, ${pulse})`;
+        ctx.fillRect(b.x + b.w / 2 - 2, b.y - b.antenna.h - 3, 4, 4);
+      }
+
+      for (const win of b.wins) {
+        if (win.blink) {
+          win.timer--;
+          if (win.timer <= 0) { win.on = !win.on; win.timer = 40 + Math.random() * 200; }
+          if (!win.on) continue;
+        }
+        ctx.fillStyle = `rgba(${win.r},${win.g},${win.b},${win.a})`;
+        ctx.fillRect(win.x, win.y, 4, 5);
+      }
+    }
+
+    // Brilho neon no chão — reflexo da cidade
+    const grd = ctx.createLinearGradient(0, h - 60, 0, h);
+    grd.addColorStop(0, 'rgba(0,0,0,0)');
+    grd.addColorStop(0.5, 'rgba(180,0,255,0.035)');
+    grd.addColorStop(1,   'rgba(255,80,0,0.05)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, h - 60, w, 60);
+
+    requestAnimationFrame(drawFrame);
+  }
+
+  function init() {
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = Math.round(window.innerHeight * 0.55);
+    makeBuildings();
+    drawFrame();
+  }
+
+  init();
+  window.addEventListener('resize', () => {
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = Math.round(window.innerHeight * 0.55);
+    makeBuildings();
+  });
+}
+
+initSkyline();
 
 // ================================================================
 // 4. MATRIX RAIN (tema cyber)
