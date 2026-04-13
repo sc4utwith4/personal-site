@@ -41,7 +41,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #000;
+  background: #05000f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,16 +88,16 @@
 #loader-logo {
   font-family: 'Space Mono', monospace;
   font-size: clamp(1.8rem, 5vw, 2.8rem);
-  color: #00ff41;
+  color: #ffd200;
   letter-spacing: 0.12em;
-  text-shadow: 0 0 20px rgba(0,255,65,0.8), 0 0 60px rgba(0,255,65,0.3);
+  text-shadow: 0 0 20px rgba(255,210,0,0.8), 0 0 60px rgba(255,150,0,0.3);
   animation: loader-logo-glitch 3s infinite;
 }
 
 #loader-cursor {
   animation: loader-blink 0.7s step-end infinite;
-  color: #00e5ff;
-  text-shadow: 0 0 10px #00e5ff;
+  color: #00c8ff;
+  text-shadow: 0 0 10px #00c8ff;
 }
 
 @keyframes loader-blink {
@@ -122,7 +122,7 @@
 .loader-line {
   font-family: 'Space Mono', monospace;
   font-size: clamp(0.65rem, 1.8vw, 0.82rem);
-  color: rgba(0,255,65,0.5);
+  color: rgba(255, 195, 40, 0.55);
   letter-spacing: 0.06em;
   opacity: 0;
   transform: translateX(-8px);
@@ -148,8 +148,8 @@
 }
 
 .ll-ok {
-  color: #00e5ff;
-  text-shadow: 0 0 8px #00e5ff;
+  color: #00c8ff;
+  text-shadow: 0 0 8px #00c8ff;
   font-weight: 700;
 }
 
@@ -163,7 +163,7 @@
 #loader-bar {
   flex: 1;
   height: 2px;
-  background: rgba(0,255,65,0.15);
+  background: rgba(255,200,0,0.12);
   position: relative;
   overflow: hidden;
 }
@@ -172,8 +172,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: #00ff41;
-  box-shadow: 0 0 10px #00ff41, 0 0 24px rgba(0,255,65,0.5);
+  background: #ffd200;
+  box-shadow: 0 0 10px #ffd200, 0 0 24px rgba(255,180,0,0.5);
   width: 0%;
   transition: width 0.08s linear;
 }
@@ -185,7 +185,7 @@
 #loader-pct {
   font-family: 'Space Mono', monospace;
   font-size: 0.65rem;
-  color: rgba(0,255,65,0.6);
+  color: rgba(255, 195, 40, 0.65);
   letter-spacing: 0.08em;
   min-width: 36px;
   text-align: right;

@@ -17,24 +17,39 @@
   // Matrix rain no loader
   lCanvas.width  = window.innerWidth;
   lCanvas.height = window.innerHeight;
-  const lCols  = Math.floor(lCanvas.width / 14);
-  const lDrops = Array(lCols).fill(1);
-  const lChars = 'アイウエオカキクケコ0123456789ABCDEF><{}[]|/\\';
+  // Chuva neon no loader — igual ao tema principal
+  const lPalette = [
+    [255,205,0], [255,205,0],
+    [0,195,255], [255,30,130], [210,225,255],
+  ];
+  const lCount = Math.floor(lCanvas.width / 6);
+  const lDrops = Array.from({ length: lCount }, () => ({
+    x: Math.random() * lCanvas.width,
+    y: Math.random() * lCanvas.height,
+    len: 10 + Math.random() * 50,
+    speed: 2.5 + Math.random() * 8,
+    alpha: 0.04 + Math.random() * 0.18,
+    c: lPalette[Math.floor(Math.random() * lPalette.length)],
+    thick: 0.4 + Math.random() * 0.6,
+  }));
 
   function drawLoaderMatrix() {
-    lCtx.fillStyle = 'rgba(0,0,0,0.065)';
-    lCtx.fillRect(0, 0, lCanvas.width, lCanvas.height);
-    lCtx.font = '13px "Space Mono", monospace';
-    for (let i = 0; i < lDrops.length; i++) {
-      const ch = lChars[Math.floor(Math.random() * lChars.length)];
-      const alpha = Math.random() > 0.5 ? 0.9 : 0.4;
-      lCtx.fillStyle = `rgba(0,255,65,${alpha})`;
-      lCtx.fillText(ch, i * 14, lDrops[i] * 14);
-      if (lDrops[i] * 14 > lCanvas.height && Math.random() > 0.975) lDrops[i] = 0;
-      lDrops[i]++;
+    lCtx.clearRect(0, 0, lCanvas.width, lCanvas.height);
+    for (const d of lDrops) {
+      d.y += d.speed;
+      if (d.y - d.len > lCanvas.height) { d.y = -d.len; d.x = Math.random() * lCanvas.width; }
+      const g = lCtx.createLinearGradient(d.x, d.y - d.len, d.x, d.y);
+      g.addColorStop(0, `rgba(${d.c[0]},${d.c[1]},${d.c[2]},0)`);
+      g.addColorStop(1, `rgba(${d.c[0]},${d.c[1]},${d.c[2]},${d.alpha})`);
+      lCtx.beginPath();
+      lCtx.strokeStyle = g;
+      lCtx.lineWidth = d.thick;
+      lCtx.moveTo(d.x, d.y - d.len);
+      lCtx.lineTo(d.x, d.y);
+      lCtx.stroke();
     }
   }
-  const lRaf = setInterval(drawLoaderMatrix, 40);
+  const lRaf = setInterval(drawLoaderMatrix, 30);
 
   // Barra de progresso via JS (controla o ::after via custom property)
   function setProgress(val) {
