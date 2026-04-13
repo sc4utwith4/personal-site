@@ -1,13 +1,95 @@
 /* ================================================================
    SCRIPT PRINCIPAL — SITE PESSOAL
-   ================================================================
-   Organização:
-     1. Cursor customizado
-     2. Grain / ruído de fundo
-     3. Player de música
-     4. Scroll reveal (animações de entrada)
-     5. Elemento secreto
 ================================================================ */
+
+// ================================================================
+// 0. LOADING SCREEN — CYBERPUNK
+// ================================================================
+
+(function initLoader() {
+  const loader   = document.getElementById('loader');
+  const bar      = document.getElementById('loader-bar');
+  const pct      = document.getElementById('loader-pct');
+  const lines    = document.querySelectorAll('.loader-line');
+  const lCanvas  = document.getElementById('loader-matrix');
+  const lCtx     = lCanvas.getContext('2d');
+
+  // Matrix rain no loader
+  lCanvas.width  = window.innerWidth;
+  lCanvas.height = window.innerHeight;
+  const lCols  = Math.floor(lCanvas.width / 14);
+  const lDrops = Array(lCols).fill(1);
+  const lChars = 'アイウエオカキクケコ0123456789ABCDEF><{}[]|/\\';
+
+  function drawLoaderMatrix() {
+    lCtx.fillStyle = 'rgba(0,0,0,0.065)';
+    lCtx.fillRect(0, 0, lCanvas.width, lCanvas.height);
+    lCtx.font = '13px "Space Mono", monospace';
+    for (let i = 0; i < lDrops.length; i++) {
+      const ch = lChars[Math.floor(Math.random() * lChars.length)];
+      const alpha = Math.random() > 0.5 ? 0.9 : 0.4;
+      lCtx.fillStyle = `rgba(0,255,65,${alpha})`;
+      lCtx.fillText(ch, i * 14, lDrops[i] * 14);
+      if (lDrops[i] * 14 > lCanvas.height && Math.random() > 0.975) lDrops[i] = 0;
+      lDrops[i]++;
+    }
+  }
+  const lRaf = setInterval(drawLoaderMatrix, 40);
+
+  // Barra de progresso via JS (controla o ::after via custom property)
+  function setProgress(val) {
+    bar.style.setProperty('--p', val + '%');
+    bar.querySelector ? null : null;
+    // Controla largura diretamente via um elemento interno
+    if (!bar._fill) {
+      bar._fill = document.createElement('div');
+      bar._fill.style.cssText = 'position:absolute;inset:0;height:100%;background:#00ff41;box-shadow:0 0 10px #00ff41,0 0 24px rgba(0,255,65,0.5);width:0%;transition:width 0.1s linear;';
+      bar.appendChild(bar._fill);
+    }
+    bar._fill.style.width = val + '%';
+    pct.textContent = Math.floor(val) + '%';
+  }
+
+  // Sequência de loading
+  let lineIdx = 0;
+  function showNextLine(cb) {
+    if (lineIdx >= lines.length) { cb && cb(); return; }
+    lines[lineIdx].classList.add('ll-show');
+    lineIdx++;
+    setTimeout(() => showNextLine(cb), lineIdx < lines.length ? 520 : 0);
+  }
+
+  // Anima a barra de 0 a 100
+  function animateBar(from, to, duration, cb) {
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      // easing: ease-in-out
+      const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      setProgress(from + (to - from) * ease);
+      if (t < 1) requestAnimationFrame(step);
+      else { setProgress(to); cb && cb(); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Sequência total
+  setTimeout(() => {
+    // Linhas 0-2 enquanto barra vai de 0 a 85
+    showNextLine(null);
+    animateBar(0, 85, 2200, () => {
+      // Linha 3 (acesso concedido) + barra vai a 100
+      lines[3].classList.add('ll-show');
+      animateBar(85, 100, 400, () => {
+        // Pequena pausa dramática, depois fecha
+        setTimeout(() => {
+          clearInterval(lRaf);
+          loader.classList.add('loader-hide');
+        }, 600);
+      });
+    });
+  }, 300);
+})();
 
 // ================================================================
 // 1. CURSOR CUSTOMIZADO

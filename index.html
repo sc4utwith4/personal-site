@@ -20,6 +20,25 @@
        CURSOR CUSTOMIZADO
        O ponto que segue o mouse. Editável no script.js
   ====================================================== -->
+  <!-- LOADING SCREEN -->
+  <div id="loader">
+    <canvas id="loader-matrix"></canvas>
+    <div id="loader-content">
+      <div id="loader-logo">arquivo<span id="loader-cursor">_</span></div>
+      <div id="loader-lines">
+        <div class="loader-line" id="ll1">&gt; iniciando sistema<span class="ll-dots"></span></div>
+        <div class="loader-line" id="ll2">&gt; carregando fragmentos<span class="ll-dots"></span></div>
+        <div class="loader-line" id="ll3">&gt; sincronizando memória<span class="ll-dots"></span></div>
+        <div class="loader-line" id="ll4">&gt; acesso concedido<span class="ll-ok"> [OK]</span></div>
+      </div>
+      <div id="loader-bar-wrap">
+        <div id="loader-bar"></div>
+        <div id="loader-pct">0%</div>
+      </div>
+    </div>
+    <div id="loader-scanlines"></div>
+  </div>
+
   <div class="cursor" id="cursor"></div>
   <div class="cursor-trail" id="cursor-trail"></div>
 
